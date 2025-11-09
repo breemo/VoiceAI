@@ -1,4 +1,4 @@
-const API_KEY = "sk_8e36f0689f799b5af5fadef88ee6747f551f17d60347baeb";
+const API_KEY = process.env.ELEVENLABS_API_KEY || "API_KEY_NOT_FOUND";
 
 document.getElementById("generateBtn").addEventListener("click", async () => {
   const text = document.getElementById("textInput").value;
