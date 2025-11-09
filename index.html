@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎙️ مولد الصوت العربي - صوت علي</title>
+  <style>
+    body {
+      font-family: "Cairo", sans-serif;
+      background: linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b);
+      color: #fff;
+      text-align: center;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+    .container {
+      background-color: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    select, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+    select, textarea {
+      background-color: rgba(255, 255, 255, 0.85);
+      color: #222;
+    }
+    button {
+      background-color: #ffaf7b;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background-color: #d76d77;
+    }
+    audio {
+      width: 100%;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎙️ مولد الصوت العربي - صوت علي</h1>
+
+    <label for="voice">اختر الصوت:</label>
+    <select id="voice">
+      <option value="EXAVITQu4vr4xnSDxMaL">Bella (أنثوي)</option>
+      <option value="pNInz6obpgDQGcFmaJgB">Adam (ذكري)</option>
+      <option value="ErXwobaYiN019PkySvjV">Rachel (متوسط)</option>
+      <option value="V2QzdR5W8yYxXnEoQd6h">Antoni (عميق)</option>
+    </select>
+
+    <label for="model">اختر النموذج:</label>
+    <select id="model">
+      <option value="eleven_multilingual_v2">Multilingual v2 (يدعم العربية ✅)</option>
+      <option value="eleven_turbo_v2">Turbo v2 (أسرع ⚡)</option>
+    </select>
+
+    <label for="text">اكتب النص هنا:</label>
+    <textarea id="text" rows="5">مرحباً يا أصدقائي! أنا علي وسأقرأ لكم قصة اليوم عن التعاون والمحبة.</textarea>
+
+    <button id="generate">🎧 توليد الصوت</button>
+
+    <audio id="player" controls></audio>
+    <a id="downloadLink" style="display:none; color:#fff; text-decoration:none;">⬇️ تحميل الملف</a>
+  </div>
+
+  <script>
+    const API_KEY = "sk_XXXXXXXXXXXX"; // 🔑 استبدلها بمفتاحك من ElevenLabs
+    const button = document.getElementById("generate");
+    const audioPlayer = document.getElementById("player");
+    const downloadLink = document.getElementById("downloadLink");
+
+    button.addEventListener("click", async () => {
+      const text = document.getElementById("text").value.trim();
+      const voice = document.getElementById("voice").value;
+      const model = document.getElementById("model").value;
+
+      if (!text) {
+        alert("الرجاء إدخال نص!");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "⏳ جاري توليد الصوت...";
+
+      try {
+        const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice}`, {
+          method: "POST",
+          headers: {
+            "xi-api-key": API_KEY,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            text: text,
+            model_id: model,
+            voice_settings: { stability: 0.4, similarity_boost: 0.7 }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("حدث خطأ أثناء الاتصال بـ ElevenLabs");
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        audioPlayer.src = url;
+        downloadLink.href = url;
+        downloadLink.download = "arabic_voice.wav";
+        downloadLink.style.display = "block";
+        downloadLink.textContent = "⬇️ تحميل الصوت الناتج";
+
+      } catch (err) {
+        alert("⚠️ فشل توليد الصوت: " + err.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = "🎧 توليد الصوت";
+      }
+    });
+  </script>
+</body>
+</html>
