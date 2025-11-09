@@ -1,37 +1,29 @@
-const API_KEY = process.env.ELEVENLABS_API_KEY || "API_KEY_NOT_FOUND";
-
-document.getElementById("generateBtn").addEventListener("click", async () => {
-  const text = document.getElementById("textInput").value;
+async function generateSpeech() {
+  const text = document.getElementById("text").value;
   const voice = document.getElementById("voice").value;
-  const audioPlayer = document.getElementById("audioPlayer");
+  const model = document.getElementById("model").value;
 
-  if (!text.trim()) {
-    alert("من فضلك اكتب النص أولاً 🎤");
-    return;
-  }
-
-  audioPlayer.src = "";
-  document.getElementById("generateBtn").innerText = "⏳ جاري التوليد...";
+  document.getElementById("status").innerText = "⏳ جاري توليد الصوت...";
 
   try {
     const response = await fetch("/api/tts", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, voice, model: "eleven_multilingual_v2" }),
-  });
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, voice, model }),
+    });
 
-    if (!response.ok) throw new Error("حدث خطأ أثناء توليد الصوت 😔");
+    if (!response.ok) throw new Error("خطأ في الاتصال مع الخادم");
 
-    const arrayBuffer = await response.arrayBuffer();
-    const blob = new Blob([arrayBuffer], { type: "audio/mpeg" });
-    const url = URL.createObjectURL(blob);
-    audioPlayer.src = url;
-    audioPlayer.play();
-  } 
-  
-  catch (error) {
-    alert(error.message);
+    const blob = await response.blob();
+    const audioUrl = URL.createObjectURL(blob);
+
+    const audio = document.getElementById("audioPlayer");
+    audio.src = audioUrl;
+    audio.play();
+
+    document.getElementById("status").innerText = "✅ تم توليد الصوت بنجاح!";
+  } catch (err) {
+    alert("⚠️ فشل توليد الصوت: " + err.message);
+    document.getElementById("status").innerText = "";
   }
-
-  document.getElementById("generateBtn").innerText = "🔊 توليد الصوت";
-});
+}
