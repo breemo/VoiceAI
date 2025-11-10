@@ -30,8 +30,9 @@ export default async function handler(req, res) {
 
     res.setHeader('Content-Type', 'audio/mpeg');
     res.send(Buffer.from(audioBuffer));
-  } catch (error) {
+  } 
+  catch (error) {
     console.error('Error:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message }); 
   }
 }
